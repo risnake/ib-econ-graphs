@@ -81,6 +81,7 @@ A template is a `Template` object: metadata, a list of `controls`, and a `build(
 
 The site deploys as an assets-only Worker; there is no server code. The setup lives in `wrangler.jsonc`:
 
+- **Build:** `wrangler deploy` runs `npm run build` itself first (`build.command`), so a deploy never needs a separate build step.
 - **Assets:** Wrangler serves `./dist`.
 - **Unknown URLs:** they get `404.html` with a real 404 status.
 - **Trailing slashes:** `/graph/tariff` redirects to `/graph/tariff/`.
@@ -91,7 +92,7 @@ To deploy through Workers Builds, connect this GitHub repository in the Cloudfla
 | Setting | Value |
 | --- | --- |
 | Worker name | `ib-econ-graphs` (must match `name` in `wrangler.jsonc`) |
-| Build command | `npm run build` |
+| Build command | leave empty (Wrangler builds the site itself) |
 | Deploy command | `npx wrangler deploy` (the default) |
 | Root directory | `/` (leave empty) |
 
@@ -101,8 +102,8 @@ To deploy or preview from your own machine:
 
 ```sh
 npx wrangler login
-npm run deploy           # astro build && wrangler deploy
-npm run preview:worker   # serve the build in the Workers runtime at http://localhost:8787
+npm run deploy           # wrangler deploy (builds first)
+npm run preview:worker   # build, then serve in the Workers runtime at http://localhost:8787
 ```
 
 ### Other static hosts

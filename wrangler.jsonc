@@ -5,6 +5,11 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "ib-econ-graphs",
   "compatibility_date": "2026-10-27",
+  // Build the site before every `wrangler deploy` / `wrangler dev`, so a
+  // deploy works even if no Build command is set in the Cloudflare dashboard.
+  "build": {
+    "command": "npm run build"
+  },
   "assets": {
     "directory": "./dist",
     // Unknown URLs get dist/404.html with a real 404 status.

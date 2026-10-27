@@ -7,8 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "preview:worker": "astro build && wrangler dev",
-    "deploy": "astro build && wrangler deploy",
+    "preview:worker": "wrangler dev",
+    "deploy": "wrangler deploy",
     "check": "astro check",
     "test": "vitest run",
     "astro": "astro"
