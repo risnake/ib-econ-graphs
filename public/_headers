@@ -1,0 +1,13 @@
+# Response headers for Cloudflare Workers static assets (not served publicly).
+
+# Hashed build output never changes for a given URL.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Gallery previews are regenerated each build but rarely change.
+/thumbs/*
+  Cache-Control: public, max-age=86400
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

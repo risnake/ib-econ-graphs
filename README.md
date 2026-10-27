@@ -77,7 +77,37 @@ A template is a `Template` object: metadata, a list of `controls`, and a `build(
 
 ## Deploying
 
-The build output is a fully static site, so any static host works (Netlify, Vercel, Cloudflare Pages, GitHub Pages). For a sub-path deployment such as GitHub Pages, set `BASE_PATH`:
+### Cloudflare Workers (static assets)
+
+The site deploys as an assets-only Worker; there is no server code. The setup lives in `wrangler.jsonc`:
+
+- **Assets:** Wrangler serves `./dist`.
+- **Unknown URLs:** they get `404.html` with a real 404 status.
+- **Trailing slashes:** `/graph/tariff` redirects to `/graph/tariff/`.
+- **Headers:** `public/_headers` sets long-lived caching for the hashed `/_astro/*` files, plus a few security headers.
+
+To deploy through Workers Builds, connect this GitHub repository in the Cloudflare dashboard (**Workers & Pages → Create → Import a repository**) and use these settings:
+
+| Setting | Value |
+| --- | --- |
+| Worker name | `ib-econ-graphs` (must match `name` in `wrangler.jsonc`) |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` (the default) |
+| Root directory | `/` (leave empty) |
+
+`.node-version` pins Node 22; Astro 7 needs 22.22 or newer. Wrangler is pinned in `devDependencies`, and Workers Builds uses that version.
+
+To deploy or preview from your own machine:
+
+```sh
+npx wrangler login
+npm run deploy           # astro build && wrangler deploy
+npm run preview:worker   # serve the build in the Workers runtime at http://localhost:8787
+```
+
+### Other static hosts
+
+The build output is a fully static site, so Netlify, Vercel or GitHub Pages also work. For a sub-path deployment such as GitHub Pages, set `BASE_PATH`:
 
 ```sh
 SITE=https://<user>.github.io BASE_PATH=/ib-econ-graphs npm run build

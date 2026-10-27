@@ -1,0 +1,15 @@
+// Cloudflare Workers config: a static-assets-only Worker (no server code).
+// Astro builds the site into ./dist, which Wrangler uploads on `wrangler deploy`.
+// The Worker name in the Cloudflare dashboard must match `name` below.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ib-econ-graphs",
+  "compatibility_date": "2026-10-27",
+  "assets": {
+    "directory": "./dist",
+    // Unknown URLs get dist/404.html with a real 404 status.
+    "not_found_handling": "404-page",
+    // /graph/tariff → /graph/tariff/ (Astro emits folder/index.html pages).
+    "html_handling": "auto-trailing-slash"
+  }
+}

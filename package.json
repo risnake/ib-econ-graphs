@@ -7,6 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "preview:worker": "astro build && wrangler dev",
+    "deploy": "astro build && wrangler deploy",
     "check": "astro check",
     "test": "vitest run",
     "astro": "astro"
@@ -33,6 +35,10 @@
     "@types/react-dom": "^19.3.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "wrangler": "^4.153.0"
+  },
+  "engines": {
+    "node": ">=22.22.0"
   }
 }
