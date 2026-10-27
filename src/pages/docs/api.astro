@@ -1,0 +1,170 @@
+---
+import { marked } from 'marked';
+import Base from '~/layouts/Base.astro';
+import { apiGuide, SKILL_NAME } from '~/agent/guide';
+import { href } from '~/lib/paths';
+
+// The guide is written for an absolute origin; the deployed host isn't known
+// at build time, so links become relative here and code samples get the real
+// origin filled in by the script at the bottom.
+const ORIGIN = '__ORIGIN__';
+const html = (marked.parse(apiGuide(ORIGIN).replace(/^# .*\n/, ''), { async: false }) as string).replace(
+  /href="__ORIGIN__/g,
+  'href="',
+);
+---
+<Base title="API for AI agents & developers · Econ Graph Studio" description="Create IB Economics diagrams from JSON with a free public API: SVG output plus an editable link. Includes llms.txt, OpenAPI and a Claude skill.">
+  <header class="sticky top-0 z-30 border-b border-line bg-surface/85 backdrop-blur">
+    <div class="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4 sm:px-6">
+      <a href={href('')} class="flex items-center gap-2">
+        <svg viewBox="0 0 32 32" class="h-7 w-7" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#191917"></rect><path d="M8 7v17h17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"></path><path d="M10 10l13 12" stroke="#3987e5" stroke-width="2.4" stroke-linecap="round"></path><path d="M10 21l13-11" stroke="#eb6834" stroke-width="2.4" stroke-linecap="round"></path></svg>
+        <span class="text-sm font-semibold tracking-tight">Econ Graph Studio</span>
+      </a>
+      <nav class="ml-auto flex items-center gap-1 text-[13px]">
+        <a href={href('#diagrams')} class="hidden rounded-lg px-3 py-1.5 text-muted hover:bg-surface-3 hover:text-ink sm:block">Diagrams</a>
+        <a href={href('studio/')} class="rounded-lg bg-accent px-3.5 py-1.5 font-medium text-accent-ink shadow-sm hover:bg-accent-hover">Open studio</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14" data-origin-root>
+    <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-muted">
+      <span class="h-1.5 w-1.5 rounded-full bg-hl"></span> For AI agents &amp; developers
+    </p>
+    <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Draw economics diagrams with an API</h1>
+    <p class="mt-3 max-w-2xl text-base leading-7 text-muted">
+      Send a small JSON spec, get back an SVG and a link that opens the graph in the editor. Free, no key, CORS enabled —
+      built so Claude and other AI agents can make correct IB Economics diagrams for you.
+    </p>
+
+    <div class="mt-8 grid gap-3 sm:grid-cols-3">
+      <a href={href('llms.txt')} class="rounded-xl border border-line bg-surface p-4 hover:border-line-strong">
+        <p class="text-sm font-semibold">llms.txt</p>
+        <p class="mt-1 text-xs leading-5 text-muted">The entry point agents look for. <code>/llms-full.txt</code> adds every template's parameters.</p>
+      </a>
+      <a href={href('openapi.json')} class="rounded-xl border border-line bg-surface p-4 hover:border-line-strong">
+        <p class="text-sm font-semibold">OpenAPI 3.1</p>
+        <p class="mt-1 text-xs leading-5 text-muted">Machine-readable description for tools, SDK generators and GPT-style actions.</p>
+      </a>
+      <a href={href(`skill/${SKILL_NAME}.zip`)} class="rounded-xl border border-line bg-surface p-4 hover:border-line-strong">
+        <p class="text-sm font-semibold">Claude skill</p>
+        <p class="mt-1 text-xs leading-5 text-muted">Download the zip to add it in Claude, or install it in Claude Code with the command below.</p>
+      </a>
+    </div>
+
+    <div class="mt-4 rounded-xl border border-line bg-surface p-4">
+      <p class="text-sm font-semibold">Install the skill in Claude Code</p>
+      <pre class="mt-2 overflow-x-auto rounded-lg bg-surface-3 p-3 text-xs"><code>mkdir -p ~/.claude/skills/{SKILL_NAME} && curl -fsSL __ORIGIN__/skill/SKILL.md -o ~/.claude/skills/{SKILL_NAME}/SKILL.md</code></pre>
+      <p class="mt-2 text-xs leading-5 text-muted">
+        On claude.ai, upload <a class="text-accent underline" href={href(`skill/${SKILL_NAME}.zip`)}>{SKILL_NAME}.zip</a> in your Skills settings. Or simply
+        tell any agent: “Read __ORIGIN__/llms.txt and draw me a tariff diagram.”
+      </p>
+    </div>
+
+    <article class="guide mt-12" set:html={html} />
+  </main>
+
+  <footer class="border-t border-line">
+    <div class="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-8 text-xs text-muted sm:flex-row sm:justify-between sm:px-6">
+      <p>Econ Graph Studio — a free diagram tool for IB Economics students and teachers.</p>
+      <p>Not affiliated with or endorsed by the International Baccalaureate Organization.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Fill the real site origin into code samples and text.
+    const root = document.querySelector('[data-origin-root]');
+    if (root) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        if (n.nodeValue?.includes('__ORIGIN__')) n.nodeValue = n.nodeValue.replaceAll('__ORIGIN__', location.origin);
+      }
+    }
+  </script>
+</Base>
+
+<style is:global>
+  .guide {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .guide h1,
+  .guide h2 {
+    margin: 2.6rem 0 0.8rem;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-top: 1px solid var(--border);
+    padding-top: 1.6rem;
+  }
+  .guide h3 {
+    margin: 1.8rem 0 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  .guide p,
+  .guide ul,
+  .guide ol,
+  .guide table,
+  .guide pre {
+    margin: 0.8rem 0;
+  }
+  .guide ul {
+    list-style: disc;
+    padding-left: 1.3rem;
+  }
+  .guide ol {
+    list-style: decimal;
+    padding-left: 1.3rem;
+  }
+  .guide li {
+    margin: 0.3rem 0;
+  }
+  .guide a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .guide code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.86em;
+    background: var(--surface-3);
+    border-radius: 5px;
+    padding: 0.1em 0.35em;
+  }
+  .guide pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .guide pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+  .guide table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    display: block;
+    overflow-x: auto;
+  }
+  .guide th,
+  .guide td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.45rem 0.7rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .guide th {
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .guide strong {
+    font-weight: 600;
+  }
+</style>

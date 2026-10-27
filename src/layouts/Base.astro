@@ -28,6 +28,10 @@ const base = import.meta.env.BASE_URL;
     <meta name="theme-color" content="#f4f4f1" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#111110" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href={`${base.replace(/\/$/, '')}/favicon.svg`} />
+    <!-- For AI agents and developers: a public API for creating these diagrams. -->
+    <link rel="alternate" type="text/markdown" href={`${base.replace(/\/$/, '')}/llms.txt`} title="Guide for AI agents (llms.txt)" />
+    <link rel="service-desc" type="application/openapi+json" href={`${base.replace(/\/$/, '')}/openapi.json`} title="Econ Graph Studio API" />
+    <link rel="service-doc" type="text/html" href={`${base.replace(/\/$/, '')}/docs/api/`} title="API documentation" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <script is:inline>

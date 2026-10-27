@@ -70,6 +70,7 @@ export default function Editor({ initialId }: { initialId?: string }) {
       }
       if (!getTemplate(id)) id = DEFAULT_ID;
     }
+    document.getElementById('static-preview')?.remove();
     const loaded = bootEditor(id);
     if (!initialId || loaded !== initialId) history.replaceState(null, '', href(`graph/${loaded}/`));
     setReady(true);

@@ -11,3 +11,4 @@
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Link: </llms.txt>; rel="alternate"; type="text/markdown", </openapi.json>; rel="service-desc"; type="application/openapi+json"

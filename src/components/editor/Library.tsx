@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Bookmark, ChevronRight, Search, Trash2, X } from 'lucide-react';
+import { Bookmark, ChevronRight, Code2, Search, Trash2, X } from 'lucide-react';
 import type { Template } from '~/engine/types';
 import { groupedTemplates } from '~/templates';
 import { useEditor, type SavedGraph } from '~/store/editor';
+import { href } from '~/lib/paths';
 import { Badge, cx, IconButton } from './ui';
 
 function matches(t: Template, q: string): boolean {
@@ -182,6 +183,13 @@ export function Library({
           </ul>
         )}
       </nav>
+      <a
+        href={href('docs/api/')}
+        className="flex items-center gap-1.5 border-t border-line px-4 py-2.5 text-xs text-muted hover:bg-surface-3 hover:text-ink"
+      >
+        <Code2 className="h-3.5 w-3.5" />
+        Create graphs with code or AI agents — API
+      </a>
     </div>
   );
 }

@@ -28,6 +28,28 @@ A web app for drawing IB Economics diagrams (SL and HL) for internal assessments
   - Edits autosave per diagram in the browser, with undo/redo.
   - "My graphs" stores finished figures.
   - Share links encode the whole graph in the URL.
+- **API for AI agents and developers:** POST a small JSON spec to `/api/v1/render` and get an SVG plus a link that opens the graph in the editor. Details below.
+
+## API for AI agents
+
+The Worker in `worker/` serves a free public JSON API (no key, CORS enabled) that renders any template, or a fully custom diagram on `blank-axes`, to SVG. It uses the same engine as the editor.
+
+| Endpoint | What it does |
+| --- | --- |
+| `GET /api/v1/templates` | List templates (`?q=`, `?unit=`, `?hl=`) |
+| `GET /api/v1/templates/{id}` | A template's params, panels and label keys |
+| `POST /api/v1/render` | JSON spec → `{ svg, editUrl, svgUrl, labels, stats, warnings }` (`?format=svg` for the raw image) |
+| `GET /api/v1/render/{id}.svg?param=value` | Embeddable image URL |
+
+Agents find it through the usual discovery points; all of them are generated from the template registry, so they stay in sync:
+
+- **[`/llms.txt`](https://llmstxt.org):** a short guide plus the template index. `/llms-full.txt` adds every parameter.
+- **`/openapi.json`:** an OpenAPI 3.1 description.
+- **`/skill/SKILL.md`:** a Claude skill. `/skill/ib-econ-graphs.zip` is the upload for claude.ai.
+- **Page metadata:** `<link rel="alternate" type="text/markdown">` and `rel="service-desc"` on every page, plus a matching `Link` header.
+- **Visible pointers:** the footer, the editor sidebar, and each graph page's loading view link to the docs. The human-readable version is `/docs/api/`.
+
+The API returns SVG only. Rasterising PNGs in the Worker would exceed the free plan's 10 ms CPU limit, so agents convert SVGs locally, or people use Export in the editor.
 
 ## Tech
 
@@ -64,7 +86,9 @@ src/
   components/   the editor island (library, canvas, inspector, export dialog)
   store/        editor state: undo/redo, autosave, saved graphs, share links
   lib/          export (PNG/SVG/PDF/clipboard), scene helpers, paths
-  pages/        landing page + gallery, /graph/[id] editor pages, /thumbs/[id].svg previews
+  pages/        landing page + gallery, /graph/[id] editor pages, /thumbs/[id].svg previews, /docs/api
+  agent/        public graph spec (validation + server rendering), template schemas, generated agent docs
+worker/         Cloudflare Worker: /api/*, /llms.txt, /openapi.json, /skill/*
 ```
 
 ## Adding a diagram
@@ -79,8 +103,9 @@ A template is a `Template` object: metadata, a list of `controls`, and a `build(
 
 ### Cloudflare Workers (static assets)
 
-The site deploys as an assets-only Worker; there is no server code. The setup lives in `wrangler.jsonc`:
+The site deploys as a Worker with static assets. The setup lives in `wrangler.jsonc`:
 
+- **Worker code:** `worker/index.ts` only runs for the API and agent-doc paths listed in `run_worker_first`. Every other request is served straight from the static files.
 - **Build:** `wrangler deploy` runs `npm run build` itself first (`build.command`), so a deploy never needs a separate build step.
 - **Assets:** Wrangler serves `./dist`.
 - **Unknown URLs:** they get `404.html` with a real 404 status.

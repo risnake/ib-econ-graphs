@@ -4,6 +4,7 @@ import Editor from '~/components/editor/Editor';
 import { GraphSVG } from '~/engine/GraphSVG';
 import { DEFAULT_STYLE } from '~/engine/theme';
 import { TEMPLATES, defaultParams, getTemplate } from '~/templates';
+import { href } from '~/lib/paths';
 
 export function getStaticPaths() {
   return TEMPLATES.map((t) => ({ params: { id: t.id } }));
@@ -14,14 +15,23 @@ const t = getTemplate(id!)!;
 const preview = t.build(defaultParams(t));
 ---
 <Base title={`${t.name} · Econ Graph Studio`} description={`${t.description} Draw, customise and export this IB Economics diagram.`} app>
-  <Editor client:only="react" initialId={t.id}>
-    <div slot="fallback" class="flex h-dvh flex-col">
-      <div class="h-13 border-b border-line bg-surface"></div>
-      <div class="canvas-backdrop flex flex-1 items-center justify-center p-6">
-        <div class="w-full max-w-[640px] rounded-lg bg-white shadow-card">
+  {/* Shown until the editor mounts (which removes it); also what crawlers and AI agents read. */}
+  <div id="static-preview" class="fixed inset-0 flex flex-col">
+    <div class="h-13 border-b border-line bg-surface"></div>
+    <div class="canvas-backdrop flex flex-1 items-center justify-center overflow-auto p-6">
+      <div class="w-full max-w-[640px]">
+        <h1 class="mb-3 text-lg font-semibold">{t.name}</h1>
+        <div class="rounded-lg bg-white shadow-card">
           <GraphSVG scene={preview} style={DEFAULT_STYLE} className="block h-auto w-full" ariaLabel={t.name} />
         </div>
+        <p class="mt-3 text-xs leading-5 text-muted">
+          Loading the editor… AI agents and developers can also create this diagram with the API:
+          <code>GET {href(`api/v1/render/${t.id}.svg`)}</code> or <code>POST {href('api/v1/render')}</code> with
+          <code>{`{"template": "${t.id}"}`}</code>. Parameters: <a class="underline" href={href(`api/v1/templates/${t.id}`)}>{href(`api/v1/templates/${t.id}`)}</a> · Guide:
+          <a class="underline" href={href('llms.txt')}>{href('llms.txt')}</a>
+        </p>
       </div>
     </div>
-  </Editor>
+  </div>
+  <Editor client:only="react" initialId={t.id} />
 </Base>

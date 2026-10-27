@@ -46,6 +46,7 @@ const features = [
       </a>
       <nav class="ml-auto flex items-center gap-1 text-[13px]">
         <a href="#diagrams" class="hidden rounded-lg px-3 py-1.5 text-muted hover:bg-surface-3 hover:text-ink sm:block">Diagrams</a>
+        <a href={href('docs/api/')} class="hidden rounded-lg px-3 py-1.5 text-muted hover:bg-surface-3 hover:text-ink sm:block">API</a>
         <a href={href('studio/')} class="rounded-lg bg-accent px-3.5 py-1.5 font-medium text-accent-ink shadow-sm hover:bg-accent-hover">Open studio</a>
       </nav>
     </div>
@@ -149,8 +150,12 @@ const features = [
   </main>
 
   <footer class="border-t border-line">
-    <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-xs text-muted sm:flex-row sm:justify-between sm:px-6">
+    <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-xs text-muted lg:flex-row lg:justify-between lg:gap-6 sm:px-6">
       <p>Econ Graph Studio — a free diagram tool for IB Economics students and teachers.</p>
+      <p>
+        AI agents &amp; developers: create these diagrams with the <a href={href('docs/api/')} class="underline hover:text-ink">public API</a>
+        (<a href={href('llms.txt')} class="underline hover:text-ink">llms.txt</a>).
+      </p>
       <p>Not affiliated with or endorsed by the International Baccalaureate Organization.</p>
     </div>
   </footer>
