@@ -1,0 +1,9 @@
+---
+import Base from '~/layouts/Base.astro';
+import Editor from '~/components/editor/Editor';
+---
+<Base title="Studio · Econ Graph Studio" app>
+  <Editor client:only="react">
+    <div slot="fallback" class="flex h-dvh items-center justify-center text-sm text-muted">Loading editor…</div>
+  </Editor>
+</Base>

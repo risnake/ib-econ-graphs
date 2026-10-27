@@ -1,0 +1,176 @@
+---
+import Base from '~/layouts/Base.astro';
+import { GraphSVG } from '~/engine/GraphSVG';
+import { DEFAULT_STYLE } from '~/engine/theme';
+import { TEMPLATES, defaultParams, getTemplate, groupedTemplates } from '~/templates';
+import { href } from '~/lib/paths';
+
+const heroTemplate =
+  getTemplate('tariff') ?? getTemplate('indirect-tax-specific') ?? getTemplate('consumer-producer-surplus')!;
+const heroScene = heroTemplate.build(defaultParams(heroTemplate));
+const groups = groupedTemplates();
+const total = TEMPLATES.length;
+const hlCount = TEMPLATES.filter((t) => t.hl).length;
+const searchText = (t: (typeof TEMPLATES)[number]) =>
+  [t.name, t.topic, t.description, ...(t.keywords ?? []), t.hl ? 'hl higher level' : ''].join(' ').toLowerCase();
+
+const features = [
+  {
+    title: 'Every unit, SL and HL',
+    body: `${total} diagrams across all four units — from PPCs to price discrimination, Phillips curves and J-curves.`,
+    icon: 'M4 5h16M4 12h16M4 19h10',
+  },
+  {
+    title: 'Drawn the IB way',
+    body: 'Subscripted labels, dashed guides to the axes, correctly placed welfare-loss triangles and shaded areas.',
+    icon: 'M5 19V5m0 14h14M8 15l4-5 3 3 4-6',
+  },
+  {
+    title: 'Edit anything',
+    body: 'Drag curves and labels, rename anything, recolour, hatch for B/W printing, add your own arrows and notes.',
+    icon: 'M4 20l4-1 11-11-3-3L5 16l-1 4zM14 6l3 3',
+  },
+  {
+    title: 'Export for your IA',
+    body: 'Sharp PNG up to 4×, vector SVG and PDF, or copy straight into Google Docs, Word or Slides.',
+    icon: 'M12 4v11m0 0l-4-4m4 4l4-4M5 20h14',
+  },
+];
+---
+<Base title="Econ Graph Studio — every IB Economics diagram, ready for your IA">
+  <header class="sticky top-0 z-30 border-b border-line bg-surface/85 backdrop-blur">
+    <div class="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
+      <a href={href('')} class="flex items-center gap-2">
+        <svg viewBox="0 0 32 32" class="h-7 w-7" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#191917"></rect><path d="M8 7v17h17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"></path><path d="M10 10l13 12" stroke="#3987e5" stroke-width="2.4" stroke-linecap="round"></path><path d="M10 21l13-11" stroke="#eb6834" stroke-width="2.4" stroke-linecap="round"></path></svg>
+        <span class="text-sm font-semibold tracking-tight">Econ Graph Studio</span>
+      </a>
+      <nav class="ml-auto flex items-center gap-1 text-[13px]">
+        <a href="#diagrams" class="hidden rounded-lg px-3 py-1.5 text-muted hover:bg-surface-3 hover:text-ink sm:block">Diagrams</a>
+        <a href={href('studio/')} class="rounded-lg bg-accent px-3.5 py-1.5 font-medium text-accent-ink shadow-sm hover:bg-accent-hover">Open studio</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-12 pb-14 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:pt-20 lg:pb-20">
+      <div>
+        <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-muted">
+          <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+          IB Economics · SL &amp; HL · all four units
+        </p>
+        <h1 class="text-4xl leading-[1.08] font-semibold tracking-tight text-balance sm:text-5xl">
+          Every IB Economics diagram, ready for your IA.
+        </h1>
+        <p class="mt-5 max-w-xl text-base leading-7 text-pretty text-muted sm:text-lg">
+          Pick a diagram, adjust the curves, rename the labels and export a crisp PNG, SVG or PDF — drawn with the
+          conventions examiners expect.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href={href('studio/')} class="inline-flex h-11 items-center gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-accent-ink shadow-sm hover:bg-accent-hover">
+            Start drawing
+            <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </a>
+          <a href="#diagrams" class="inline-flex h-11 items-center rounded-xl border border-line bg-surface px-5 text-sm font-semibold text-ink hover:border-line-strong">
+            Browse {total} diagrams
+          </a>
+        </div>
+        <p class="mt-6 text-xs text-faint">Free · no sign-up · your work autosaves in this browser</p>
+      </div>
+
+      <a href={href(`graph/${heroTemplate.id}/`)} class="group relative block" aria-label={`Open ${heroTemplate.name}`}>
+        <div class="absolute -inset-3 rounded-[28px] bg-gradient-to-br from-accent/15 via-transparent to-hl/15 blur-2xl"></div>
+        <div class="relative rounded-2xl border border-line bg-white p-3 shadow-card transition-transform group-hover:-translate-y-0.5 sm:p-5">
+          <GraphSVG scene={heroScene} style={DEFAULT_STYLE} className="block h-auto w-full" ariaLabel={heroTemplate.name} />
+        </div>
+        <div class="absolute -bottom-4 left-4 flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium shadow-card sm:left-8">
+          <span class="h-2 w-2 rounded-full bg-[#1baf7a]"></span>
+          {heroTemplate.name}
+        </div>
+        <div class="absolute -top-3 right-4 hidden items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium shadow-card sm:flex">
+          <svg class="h-3.5 w-3.5 text-accent" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v8m0 0L5 7m3 3l3-3M3 13h10" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          PNG · SVG · PDF
+        </div>
+      </a>
+    </section>
+
+    <section class="border-y border-line bg-surface">
+      <div class="mx-auto grid max-w-6xl gap-px px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
+        {features.map((f) => (
+          <div class="py-7 sm:pr-6">
+            <svg class="mb-3 h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d={f.icon}></path></svg>
+            <h2 class="text-sm font-semibold">{f.title}</h2>
+            <p class="mt-1.5 text-[13px] leading-6 text-muted">{f.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="diagrams" class="mx-auto max-w-6xl scroll-mt-16 px-4 py-14 sm:px-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold tracking-tight">All diagrams</h2>
+          <p class="mt-1 text-sm text-muted">{total} diagrams · {hlCount} HL-only · click one to open it in the studio</p>
+        </div>
+        <div class="relative w-full sm:w-80">
+          <svg class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-faint" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14" stroke-linecap="round"></path></svg>
+          <input id="gallery-search" type="search" placeholder="Search — e.g. tariff, monopoly, Phillips" aria-label="Search diagrams"
+            class="h-10 w-full rounded-xl border border-line bg-surface pr-3 pl-9 text-sm placeholder:text-faint hover:border-line-strong focus:border-accent focus:outline-none" />
+        </div>
+      </div>
+
+      <p id="gallery-empty" class="hidden py-16 text-center text-sm text-muted">No diagrams match your search.</p>
+
+      {groups.map(({ unit, topics }) => (
+        <div class="gallery-unit mt-12" data-unit={unit.id}>
+          <h3 class="mb-1 text-xs font-semibold tracking-wider text-faint uppercase">{unit.name}</h3>
+          {topics.map(({ topic, items }) => (
+            <div class="gallery-topic mt-5">
+              <h4 class="mb-3 text-sm font-semibold text-ink">{topic}</h4>
+              <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {items.map((t) => (
+                  <li class="gallery-item" data-search={searchText(t)}>
+                    <a href={href(`graph/${t.id}/`)} class="group block h-full overflow-hidden rounded-xl border border-line bg-surface transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-card">
+                      <div class="border-b border-line bg-white p-2">
+                        <img src={href(`thumbs/${t.id}.svg`)} alt="" loading="lazy" decoding="async" class="block aspect-[559/475] h-auto w-full object-contain" />
+                      </div>
+                      <div class="flex items-start gap-2 px-3 py-2.5">
+                        <span class="min-w-0 flex-1 text-[13px] leading-5 font-medium text-ink group-hover:text-accent">{t.name}</span>
+                        {t.hl && <span class="mt-0.5 inline-flex h-4.5 items-center rounded bg-hl-soft px-1.5 text-[10px] font-semibold text-hl">HL</span>}
+                      </div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      ))}
+    </section>
+  </main>
+
+  <footer class="border-t border-line">
+    <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-xs text-muted sm:flex-row sm:justify-between sm:px-6">
+      <p>Econ Graph Studio — a free diagram tool for IB Economics students and teachers.</p>
+      <p>Not affiliated with or endorsed by the International Baccalaureate Organization.</p>
+    </div>
+  </footer>
+
+  <script>
+    const input = document.getElementById('gallery-search') as HTMLInputElement | null;
+    const empty = document.getElementById('gallery-empty');
+    input?.addEventListener('input', () => {
+      const words = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      document.querySelectorAll<HTMLElement>('.gallery-item').forEach((li) => {
+        const hay = li.dataset.search ?? '';
+        const ok = words.every((w) => hay.includes(w));
+        li.hidden = !ok;
+        if (ok) shown++;
+      });
+      document.querySelectorAll<HTMLElement>('.gallery-topic, .gallery-unit').forEach((sec) => {
+        sec.hidden = !sec.querySelector('.gallery-item:not([hidden])');
+      });
+      empty?.classList.toggle('hidden', shown > 0);
+    });
+  </script>
+</Base>

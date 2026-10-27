@@ -1,0 +1,27 @@
+---
+import Base from '~/layouts/Base.astro';
+import Editor from '~/components/editor/Editor';
+import { GraphSVG } from '~/engine/GraphSVG';
+import { DEFAULT_STYLE } from '~/engine/theme';
+import { TEMPLATES, defaultParams, getTemplate } from '~/templates';
+
+export function getStaticPaths() {
+  return TEMPLATES.map((t) => ({ params: { id: t.id } }));
+}
+
+const { id } = Astro.params;
+const t = getTemplate(id!)!;
+const preview = t.build(defaultParams(t));
+---
+<Base title={`${t.name} · Econ Graph Studio`} description={`${t.description} Draw, customise and export this IB Economics diagram.`} app>
+  <Editor client:only="react" initialId={t.id}>
+    <div slot="fallback" class="flex h-dvh flex-col">
+      <div class="h-13 border-b border-line bg-surface"></div>
+      <div class="canvas-backdrop flex flex-1 items-center justify-center p-6">
+        <div class="w-full max-w-[640px] rounded-lg bg-white shadow-card">
+          <GraphSVG scene={preview} style={DEFAULT_STYLE} className="block h-auto w-full" ariaLabel={t.name} />
+        </div>
+      </div>
+    </div>
+  </Editor>
+</Base>

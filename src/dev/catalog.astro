@@ -1,0 +1,63 @@
+---
+/**
+ * Dev-only review page. Renders every template (or ?id=a,b) with its defaults.
+ * ?variants=1 also renders each select option and all-toggles-on/off variants.
+ * ?p={"key":value} merges params into every render.
+ */
+import { GraphSVG } from '~/engine/GraphSVG';
+import { DEFAULT_STYLE } from '~/engine/theme';
+import { TEMPLATES, defaultParams } from '~/templates';
+import type { Params, Template } from '~/engine/types';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+
+const q = Astro.url.searchParams;
+const ids = q.get('id')?.split(',').filter(Boolean);
+const withVariants = q.get('variants') === '1';
+const extra: Params = q.get('p') ? JSON.parse(q.get('p')!) : {};
+const style = { ...DEFAULT_STYLE, ...(q.get('style') ? JSON.parse(q.get('style')!) : {}) };
+
+function variants(t: Template): { name: string; params: Params }[] {
+  const base = { ...defaultParams(t), ...extra };
+  const out = [{ name: 'default', params: base }];
+  if (!withVariants) return out;
+  for (const c of t.controls) {
+    if (c.type === 'select') {
+      for (const o of c.options) if (o.value !== base[c.key]) out.push({ name: `${c.key}=${o.value}`, params: { ...base, [c.key]: o.value } });
+    }
+  }
+  const toggles = t.controls.filter((c) => c.type === 'toggle');
+  if (toggles.length) {
+    out.push({ name: 'all toggles on', params: { ...base, ...Object.fromEntries(toggles.map((c) => [c.key, true])) } });
+    out.push({ name: 'all toggles off', params: { ...base, ...Object.fromEntries(toggles.map((c) => [c.key, false])) } });
+  }
+  return out;
+}
+
+const items = TEMPLATES.filter((t) => !ids || ids.includes(t.id)).flatMap((t) =>
+  variants(t).map((v, i) => {
+    let scene = null;
+    let error = '';
+    try {
+      scene = t.build(v.params);
+    } catch (e) {
+      error = String((e as Error)?.stack ?? e);
+    }
+    return { t, v, i, scene, error };
+  }),
+);
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Catalog</title>
+  <style>body{margin:0;padding:16px;background:#eee;font-family:Inter,sans-serif} .item{display:inline-block;margin:8px;background:#fff;padding:8px;vertical-align:top} h3{margin:0 0 4px;font-size:13px} pre{color:#b00;max-width:600px;white-space:pre-wrap}</style>
+  </head>
+  <body>
+    {items.map(({ t, v, i, scene, error }) => (
+      <div class="item" data-id={withVariants ? `${t.id}--${i}` : t.id}>
+        <h3>{t.id} · {v.name}</h3>
+        {scene ? <GraphSVG scene={scene} style={style} title={t.caption} /> : <pre>{error}</pre>}
+      </div>
+    ))}
+  </body>
+</html>
